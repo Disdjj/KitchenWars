@@ -21,7 +21,7 @@ export async function POST(req: NextRequest): Promise<Response> {
   try {
     const serviceAdapter = new GoogleGenerativeAIAdapter({
       apiKey: googleApiKey,
-      model: 'gemini-1.5-pro',
+      model: 'gemini-2.5-flash',
     })
 
     const { handleRequest } = copilotRuntimeNextJSAppRouterEndpoint({

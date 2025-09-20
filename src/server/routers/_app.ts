@@ -1,5 +1,6 @@
 import { router } from '../trpc'
 import { helloRouter } from './hello'
+import { gameRouter } from './game'
 
 /**
  * 这是tRPC的主路由
@@ -7,6 +8,7 @@ import { helloRouter } from './hello'
  */
 export const appRouter = router({
   hello: helloRouter,
+  game: gameRouter,
 })
 
 // 导出路由类型，供客户端使用
