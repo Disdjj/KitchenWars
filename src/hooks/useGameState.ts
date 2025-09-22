@@ -30,6 +30,8 @@ export interface GameState {
     effects: Partial<GameValues>
     beforeValues: GameValues
     afterValues: GameValues
+    eventTitle?: string
+    choiceText?: string
   }>
 }
 
@@ -277,11 +279,27 @@ export function useGameState() {
             effects,
             beforeValues,
             afterValues,
+            eventTitle: prev.currentEvent?.title,
+            choiceText:
+              choice === 'left'
+                ? prev.currentEvent?.leftChoice
+                : prev.currentEvent?.rightChoice,
           },
         ],
         playerTags: analyzePlayerBehavior([
           ...prev.choiceHistory,
-          { day: prev.currentDay, choice, effects, beforeValues, afterValues },
+          {
+            day: prev.currentDay,
+            choice,
+            effects,
+            beforeValues,
+            afterValues,
+            eventTitle: prev.currentEvent?.title,
+            choiceText:
+              choice === 'left'
+                ? prev.currentEvent?.leftChoice
+                : prev.currentEvent?.rightChoice,
+          },
         ]),
         currentEvent: null, // 清空当前事件，准备加载下一个
       }))

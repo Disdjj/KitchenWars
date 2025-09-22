@@ -171,7 +171,6 @@ export default function Home() {
         </div>
 
         {/* Magic Showcase for visual appeal */}
-        <MagicShowcase />
       </main>
     </div>
   )

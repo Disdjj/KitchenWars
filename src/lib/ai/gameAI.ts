@@ -153,6 +153,28 @@ export class GameAIEngine {
     const dayPhase = this.getDayPhase(session.currentDay)
     const crisis = this.shouldTriggerCrisis(session, recentChoices)
 
+    // 随机选择事件类型，确保多样性
+    const eventTypes = [
+      '食品安全事件',
+      '员工管理问题',
+      '网络舆论危机',
+      '供应链问题',
+      '竞争对手挑战',
+      '政策法规变化',
+      '顾客投诉纠纷',
+      '媒体采访报道',
+      '节日营销机会',
+      '设备故障维修',
+      '新菜品研发',
+      '租金成本压力',
+      '网红合作邀请',
+      '环保监督检查',
+      '税务稽查审计',
+      '员工培训需求',
+    ]
+    const randomEventType =
+      eventTypes[Math.floor(Math.random() * eventTypes.length)]
+
     return `你是《后厨风云》游戏的剧情设计师。请为玩家生成一个餐厅经营事件。
 
 【游戏背景】
@@ -163,23 +185,57 @@ export class GameAIEngine {
 - 数值状态: ${values}
 - 玩家标签: ${tags}
 - 最近选择趋势: ${this.analyzeChoiceTrend(recentChoices)}
+- 建议事件类型: ${randomEventType}
 ${crisis ? '- ⚠️ 需要触发危机事件' : ''}
 
+【有趣事件示例】
+- **标题**: "厕所改造成打卡点，顾客竟在马桶上自拍？"
+  - **描述**: "市场部小张提议，把餐厅的厕所改造成赛博朋克风格，增加镜子和灯光，吸引顾客拍照打卡。但这需要一笔不小的预算，而且可能会让只想上厕所的顾客感到尴尬。"
+  - **左选择**: "“艺术”就是一切！马上动工！"
+  - **右选择**: "厕所是用来上厕所的，不是拍照的！"
+
+- **标题**: "后厨惊现“爱因斯坦”，厨师用量子力学炒菜？"
+  - **描述**: "厨师老王最近沉迷于量子力学，声称发现了“量子纠缠炒菜法”，能让菜品味道提升一个维度。但他需要昂贵的“量子发生器”，而且经常在后厨进行危险的实验。"
+  - **左选择**: "支持创新！立即采购设备！"
+  - **右选择**: "科学归科学，炒菜归炒菜，别胡闹！"
+
+- **标题**: "隔壁餐厅老板娘半夜来借盐，是商业间谍还是真爱？"
+  - **描述**: "隔壁餐厅的老板娘经常深夜来借盐、借酱油，还对你的经营模式问东问西。员工怀疑她是商业间谍，但她似乎对你很感兴趣。"
+  - **左选择**: "“盐”多必失，保持警惕！"
+  - **右选择**: "也许是真爱？和她深入交流一下！"
+
+【事件类型多样性要求】
+必须从以下类型中随机选择，避免重复的探店事件：
+1. 【食品安全】- 食材问题、卫生检查、过期原料、添加剂争议
+2. 【员工管理】- 离职风波、工资纠纷、技能培训、团队冲突
+3. 【舆论危机】- 网络差评、热搜事件、水军攻击、口碑翻车
+4. 【供应链】- 原料涨价、断货危机、供应商问题、物流延误
+5. 【竞争压力】- 新店开业、价格战、挖角事件、模仿抄袭
+6. 【政策监管】- 执照检查、税务稽查、环保要求、劳动法规
+7. 【顾客服务】- 投诉纠纷、特殊需求、VIP服务、退款争议
+8. 【媒体曝光】- 记者暗访、电视采访、自媒体测评、负面报道
+9. 【营销机会】- 节日促销、网红合作、平台活动、广告投放
+10. 【运营挑战】- 设备故障、装修升级、菜单更新、成本控制
+
 【生成要求】
-1. 事件要符合玩家的行为标签，有针对性
+1. 事件要符合建议的事件类型，避免总是生成探店相关内容
 2. 标题要吸引眼球，像真实的热搜标题
 3. 描述要生动具体，包含网络梗和热点元素
 4. 两个选择要形成明显的价值观冲突（口碑vs利润）
-5. 数值影响要合理，单项影响控制在-30到+30之间
+5. 数值影响要合理，单项影响控制在-15到+15之间（降低影响幅度）
 6. 语言风格要幽默讽刺，符合网络文化
+7. 每次生成都要确保事件类型的随机性和多样性
 
 【参考热点元素】
 - 预制菜争议、食品安全、网红打卡、大V探店
 - 员工权益、996、最低工资、社保
 - 网络暴力、水军、热搜、流量
 - 消费降级、性价比、割韭菜
+- 直播带货、短视频营销、团购优惠
+- 环保督查、垃圾分类、碳中和
+- 疫情防控、健康码、外卖配送
 
-请生成一个符合要求的事件卡牌。`
+请生成一个符合要求的事件卡牌，确保事件类型多样化。`
   }
 
   /**
@@ -266,6 +322,113 @@ ${crisis ? '- ⚠️ 需要触发危机事件' : ''}
     if (leftCount > rightCount * 1.5) return '偏向保守/口碑导向'
     if (rightCount > leftCount * 1.5) return '偏向激进/利润导向'
     return '选择较为均衡'
+  }
+
+  /**
+   * 生成AI评价
+   */
+  async generateEvaluation(
+    session: GameSession,
+    recentChoices: Array<{
+      choice: 'left' | 'right'
+      day: number
+      effects: any
+    }>,
+  ): Promise<string> {
+    const prompt = this.buildEvaluationPrompt(session, recentChoices)
+
+    try {
+      const result = await generateObject({
+        model: this.model,
+        schema: z.object({
+          evaluation: z.string().describe('AI对玩家经营表现的评价'),
+        }),
+        prompt,
+        temperature: 0.7,
+      })
+
+      return result.object.evaluation
+    } catch (error) {
+      console.error('AI评价生成失败:', error)
+      return this.getDefaultEvaluation(session)
+    }
+  }
+
+  /**
+   * 构建评价提示词
+   */
+  private buildEvaluationPrompt(
+    session: GameSession,
+    recentChoices: Array<{
+      choice: 'left' | 'right'
+      day: number
+      effects: any
+    }>,
+  ): string {
+    const values = `口碑:${session.reputation}, 利润:${session.profit}, 客流:${session.customerFlow}, 员工:${session.staffMorale}`
+    const totalDays = session.currentDay
+    const choiceTrend = this.analyzeChoiceTrend(recentChoices)
+
+    // 分析玩家的经营风格
+    let profitFocused = 0
+    let reputationFocused = 0
+    let balancedChoices = 0
+
+    recentChoices.forEach((choice) => {
+      const effects = choice.effects
+      if (effects.profit > effects.reputation) profitFocused++
+      else if (effects.reputation > effects.profit) reputationFocused++
+      else balancedChoices++
+    })
+
+    const dominantStyle =
+      profitFocused > reputationFocused
+        ? '利润导向'
+        : reputationFocused > profitFocused
+          ? '口碑导向'
+          : '平衡发展'
+
+    return `你是《后厨风云》游戏的资深评论家，请对玩家的经营表现进行点评。
+
+【玩家数据】
+- 经营天数: ${totalDays}天
+- 当前状态: ${values}
+- 主要风格: ${dominantStyle}
+- 选择趋势: ${choiceTrend}
+- 利润导向选择: ${profitFocused}次
+- 口碑导向选择: ${reputationFocused}次
+- 平衡选择: ${balancedChoices}次
+
+【评价要求】
+1. 语言风格要幽默风趣，像资深游戏玩家的点评
+2. 既要肯定玩家的优点，也要指出可以改进的地方
+3. 结合具体数值进行分析，不要空泛
+4. 字数控制在100-150字之间
+5. 可以适当使用网络流行语和梗
+6. 给出具体的经营建议
+
+请生成一个有趣且有用的AI评价。`
+  }
+
+  /**
+   * 获取默认评价
+   */
+  private getDefaultEvaluation(session: GameSession): string {
+    const values = [
+      session.reputation,
+      session.profit,
+      session.customerFlow,
+      session.staffMorale,
+    ]
+    const average = values.reduce((sum, val) => sum + val, 0) / 4
+
+    if (average >= 70) {
+      return '经营有方！你已经是餐厅界的老司机了，各项数据都很不错。继续保持这个节奏，说不定能成为下一个米其林餐厅呢！'
+    } else if (average >= 50) {
+      return '中规中矩的经营，像个稳重的大叔。虽然没有什么亮眼表现，但也没有踩大坑。建议可以尝试更大胆的策略，毕竟富贵险中求嘛！'
+    } else {
+      return 'emmm...经营状况有点堪忧啊朋友。不过别灰心，失败乃成功之母，从错误中学习才能成长。建议重新审视一下经营策略哦！'
+    }
   }
 
   /**

@@ -88,17 +88,22 @@ export const gameRouter = router({
             // 之后使用AI生成事件，如果失败则使用预设事件
             try {
               // 分析玩家行为
+              const sessionWithTags = {
+                ...session,
+                playerTags: JSON.parse(session.playerTags || '[]'),
+              } as GameSession
+
               const playerTags = await gameAI.analyzePlayerBehavior(
                 recentChoices.map((c) => ({
                   choice: c.choice as 'left' | 'right',
                   effects: JSON.parse(c.afterValues),
                 })),
-                session as GameSession,
+                sessionWithTags,
               )
 
               // 生成AI事件
               currentEvent = await gameAI.generateEventCard(
-                session as GameSession,
+                sessionWithTags,
                 playerTags,
                 recentChoices.map((c) => ({
                   choice: c.choice as 'left' | 'right',
@@ -177,11 +182,17 @@ export const gameRouter = router({
                 choice: c.choice as 'left' | 'right',
                 effects: JSON.parse(c.afterValues),
               })),
-              session as GameSession,
+              {
+                ...session,
+                playerTags: JSON.parse(session.playerTags || '[]'),
+              } as GameSession,
             )
 
             currentEvent = await gameAI.generateEventCard(
-              session as GameSession,
+              {
+                ...session,
+                playerTags: JSON.parse(session.playerTags || '[]'),
+              } as GameSession,
               playerTags,
               recentChoices.map((c) => ({
                 choice: c.choice as 'left' | 'right',
@@ -240,7 +251,7 @@ export const gameRouter = router({
         }
 
         // 检查是否触发结局
-        const gameEnded = this.checkGameEnding(afterValues)
+        const gameEnded = checkGameEnding(afterValues)
         const newDay = session.currentDay + 1
 
         // 更新游戏会话
@@ -342,6 +353,52 @@ export const gameRouter = router({
       } catch (error) {
         console.error('生成AI事件失败:', error)
         throw new Error('生成AI事件失败')
+      }
+    }),
+
+  /**
+   * 生成AI评价
+   */
+  generateEvaluation: publicProcedure
+    .input(gameInputSchema.getGameState)
+    .mutation(async ({ input }) => {
+      try {
+        // 获取游戏会话
+        const session = await db.query.gameSessionsTable.findFirst({
+          where: eq(gameSessionsTable.id, input.sessionId),
+        })
+
+        if (!session) {
+          throw new Error('游戏会话不存在')
+        }
+
+        // 获取最近的选择记录
+        const recentChoices = await db.query.playerChoicesTable.findMany({
+          where: eq(playerChoicesTable.sessionId, input.sessionId),
+          orderBy: [desc(playerChoicesTable.day)],
+          limit: 10,
+        })
+
+        // 生成AI评价
+        const evaluation = await gameAI.generateEvaluation(
+          {
+            ...session,
+            playerTags: JSON.parse(session.playerTags || '[]'),
+          } as GameSession,
+          recentChoices.map((c) => ({
+            choice: c.choice as 'left' | 'right',
+            day: c.day,
+            effects: JSON.parse(c.afterValues),
+          })),
+        )
+
+        return {
+          success: true,
+          evaluation,
+        }
+      } catch (error) {
+        console.error('生成AI评价失败:', error)
+        throw new Error('生成AI评价失败')
       }
     }),
 })

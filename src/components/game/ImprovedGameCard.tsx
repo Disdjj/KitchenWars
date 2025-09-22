@@ -79,15 +79,14 @@ export default function ImprovedGameCard({
         return (
           <div
             key={key}
-            className={`flex items-center gap-1 px-2 py-1 rounded text-xs ${
+            className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-medium ${
               value > 0
                 ? 'bg-green-100 text-green-700'
                 : 'bg-red-100 text-red-700'
             }`}
           >
-            <Icon className='w-3 h-3' />
-            <span>
-              {label}
+            <Icon className='w-2.5 h-2.5' />
+            <span className='text-xs'>
               {value > 0 ? '+' : ''}
               {value}
             </span>
@@ -134,7 +133,7 @@ export default function ImprovedGameCard({
   }
 
   return (
-    <div className='relative w-full max-w-md mx-auto'>
+    <div className='relative w-full max-w-lg mx-auto'>
       {/* 拖拽提示 */}
       {isDragging && (
         <div className='absolute inset-0 flex items-center justify-between px-4 pointer-events-none z-50'>
@@ -170,38 +169,36 @@ export default function ImprovedGameCard({
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
-        <Card className='w-full relative overflow-hidden border-2 shadow-xl'>
+        <Card className='w-full relative overflow-hidden border-2 shadow-xl mx-2 sm:mx-0'>
           {/* 稀有度装饰 */}
           <div
             className={`absolute top-0 left-0 right-0 h-1 ${getRarityColor(event.rarity)}`}
           />
 
           <CardHeader className='pb-3'>
-            <div className='flex items-start justify-between'>
-              <div className='flex-1'>
-                <h3 className='text-lg font-bold text-foreground leading-tight mb-2'>
-                  {event.title}
-                </h3>
-                <div className='flex gap-2'>
-                  <Badge variant='secondary' className='text-xs'>
-                    {event.category === 'daily' && '日常'}
-                    {event.category === 'crisis' && '危机'}
-                    {event.category === 'opportunity' && '机遇'}
+            <div className='space-y-3'>
+              <h3 className='text-lg font-bold text-foreground leading-tight break-words'>
+                {event.title}
+              </h3>
+              <div className='flex flex-wrap gap-2'>
+                <Badge variant='secondary' className='text-xs'>
+                  {event.category === 'daily' && '日常'}
+                  {event.category === 'crisis' && '危机'}
+                  {event.category === 'opportunity' && '机遇'}
+                </Badge>
+                {event.isAIGenerated && (
+                  <Badge variant='outline' className='text-xs'>
+                    AI生成
                   </Badge>
-                  {event.isAIGenerated && (
-                    <Badge variant='outline' className='text-xs'>
-                      AI生成
-                    </Badge>
-                  )}
-                </div>
+                )}
               </div>
             </div>
           </CardHeader>
 
           <CardContent className='space-y-4'>
             {/* 事件描述 */}
-            <div className='max-h-32 overflow-y-auto'>
-              <p className='text-sm text-muted-foreground leading-relaxed'>
+            <div className='max-h-28 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300'>
+              <p className='text-sm text-muted-foreground leading-relaxed break-words'>
                 {event.description}
               </p>
             </div>
@@ -210,16 +207,16 @@ export default function ImprovedGameCard({
             <div className='space-y-3'>
               <Button
                 variant='outline'
-                className='w-full h-auto p-4 text-left border-red-200 hover:border-red-400 hover:bg-red-50'
+                className='w-full h-auto p-3 text-left border-red-200 hover:border-red-400 hover:bg-red-50 min-h-[60px]'
                 onClick={() => onChoice('left')}
               >
-                <div className='flex items-start gap-3 w-full'>
-                  <ChevronLeft className='w-5 h-5 text-red-500 mt-0.5 flex-shrink-0' />
-                  <div className='flex-1 min-w-0'>
-                    <div className='text-sm font-medium text-foreground mb-1'>
+                <div className='flex items-start gap-2 w-full'>
+                  <ChevronLeft className='w-4 h-4 text-red-500 mt-1 flex-shrink-0' />
+                  <div className='flex-1 min-w-0 space-y-2'>
+                    <div className='text-xs font-medium text-foreground break-words leading-tight'>
                       {event.leftChoice}
                     </div>
-                    <div className='flex flex-wrap gap-2'>
+                    <div className='flex flex-wrap gap-1'>
                       {renderEffectTags(event.leftEffects)}
                     </div>
                   </div>
@@ -228,16 +225,16 @@ export default function ImprovedGameCard({
 
               <Button
                 variant='outline'
-                className='w-full h-auto p-4 text-left border-green-200 hover:border-green-400 hover:bg-green-50'
+                className='w-full h-auto p-3 text-left border-green-200 hover:border-green-400 hover:bg-green-50 min-h-[60px]'
                 onClick={() => onChoice('right')}
               >
-                <div className='flex items-start gap-3 w-full'>
-                  <ChevronRight className='w-5 h-5 text-green-500 mt-0.5 flex-shrink-0' />
-                  <div className='flex-1 min-w-0'>
-                    <div className='text-sm font-medium text-foreground mb-1'>
+                <div className='flex items-start gap-2 w-full'>
+                  <ChevronRight className='w-4 h-4 text-green-500 mt-1 flex-shrink-0' />
+                  <div className='flex-1 min-w-0 space-y-2'>
+                    <div className='text-xs font-medium text-foreground break-words leading-tight'>
                       {event.rightChoice}
                     </div>
-                    <div className='flex flex-wrap gap-2'>
+                    <div className='flex flex-wrap gap-1'>
                       {renderEffectTags(event.rightEffects)}
                     </div>
                   </div>
